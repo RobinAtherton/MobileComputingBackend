@@ -13,9 +13,9 @@ CREATE TABLE Subjects(
 )
 
 CREATE TABLE Appointments(
-  AppointmentId int,
+  AppointmentId serial,
   SubjectKey int,
-  AppointmentType int,
+  AppointmentType varchar(255),
   AppointmentTime varchar(255),
   AppointmentDate varchar(255),
   Primary Key(AppointmentId),
