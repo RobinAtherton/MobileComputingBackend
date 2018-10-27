@@ -1,12 +1,12 @@
-POST http://localhost:8080/login
+GET http://192.168.0.4:8080/login
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 data: jsonString
 
 {
-"email": "s-rather@haw-landshut.de",
-"password": "1234"
+"email": "test",
+"password": "test"
 }
 
 ###

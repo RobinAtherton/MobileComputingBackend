@@ -12,9 +12,10 @@ import java.sql.SQLException;
 
 public class DatabaseManager {
 
-    private static DatabaseManager databaseManager = null;
-    private DataBase database;
-    private Connection connection;
+
+    private @NotNull static DatabaseManager databaseManager = null;
+    private @NotNull DataBase database;
+    private @NotNull Connection connection;
 
     private DatabaseManager() throws ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
@@ -22,7 +23,7 @@ public class DatabaseManager {
         connection = database.getConnection();
     }
 
-    public static DatabaseManager getInstance() throws ClassNotFoundException {
+    public static @Nullable DatabaseManager getInstance() throws ClassNotFoundException {
         if (databaseManager == null) {
             databaseManager = new DatabaseManager();
         }
@@ -90,7 +91,7 @@ public class DatabaseManager {
         }
     }
 
-    public DataBase getDatabase() {
+    public @NotNull DataBase getDatabase() {
         return database;
     }
 }
