@@ -1,4 +1,4 @@
-GET http://192.168.0.4:8080/login
+POST http://192.168.0.4:8080/login
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

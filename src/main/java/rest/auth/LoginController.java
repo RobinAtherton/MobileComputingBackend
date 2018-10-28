@@ -10,12 +10,12 @@ import java.sql.SQLException;
 public class LoginController {
 
     @NotNull
-    @GetMapping(value = "/login")
+    @PostMapping(value = "/login")
     public Login login(@NotNull @RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
         final String role = databaseManager.validateCredentials(credentials.getEmail(), credentials.getPassword());
-        return new Login(role);
+        return new Login(role, credentials);
     }
 
 
