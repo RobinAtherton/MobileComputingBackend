@@ -1,21 +1,27 @@
 package database;
 
+import database.models.Subject;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rest.data.Subjects;
 
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
 
 
-    private @NotNull static DatabaseManager databaseManager = null;
-    private @NotNull DataBase database;
-    private @NotNull Connection connection;
+    private @NotNull
+    static DatabaseManager databaseManager = null;
+    private @NotNull
+    DataBase database;
+    private @NotNull
+    Connection connection;
 
     private DatabaseManager() throws ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
@@ -23,7 +29,8 @@ public class DatabaseManager {
         connection = database.getConnection();
     }
 
-    public static @Nullable DatabaseManager getInstance() throws ClassNotFoundException {
+    public static @Nullable
+    DatabaseManager getInstance() throws ClassNotFoundException {
         if (databaseManager == null) {
             databaseManager = new DatabaseManager();
         }
@@ -49,6 +56,53 @@ public class DatabaseManager {
         } else {
             return "invalid credentials";
         }
+    }
+
+    public @NotNull boolean validate(@NotNull String email, @NotNull String password) throws SQLException {
+        final String sql = "SELECT Persons.PersonRole from Persons where Email = ? and PersonPassword = ?;";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, email);
+        statement.setString(2, password);
+        final ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Subject getSubject(@NotNull int subjectId) throws SQLException {
+        final String sql = "SELECT Subjects from Subjects where SubjectId = ?;";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setInt(1, subjectId);
+        final ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            int id = Integer.parseInt(resultSet.getString(1));
+            String name = resultSet.getString(2);
+            String password = resultSet.getString(3);
+            return new Subject(id, name, password);
+        }
+        return null;
+    }
+
+    public Subjects getAllSubjects(@NotNull String email, @NotNull String password) throws SQLException {
+        if (validate(email, password)) {
+            final String sql = "SELECT * from Subjects;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            final ResultSet resultSet = statement.executeQuery();
+            List<Subject> subjects = new ArrayList<>();
+            int i = 0;
+            while (resultSet.next()) {
+                int id = Integer.parseInt(resultSet.getString(1));
+                String subjectName = resultSet.getString(2);
+                String subjectPassword = resultSet.getString(3);
+                subjects.add(new Subject(id, subjectName, subjectPassword));
+            }
+            final Subject[] subjectArray = new Subject[subjects.size()];
+            subjects.toArray(subjectArray);
+            return new Subjects(subjectArray);
+        }
+        throw new SQLException("User not validated");
     }
 
     public void insertPerson(@NotNull String email, @NotNull String password, @NotNull Role role) {
@@ -91,7 +145,8 @@ public class DatabaseManager {
         }
     }
 
-    public @NotNull DataBase getDatabase() {
+    public @NotNull
+    DataBase getDatabase() {
         return database;
     }
 }

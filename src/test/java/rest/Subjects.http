@@ -1,4 +1,4 @@
-POST http://192.168.1.9:8080/login
+POST http://172.19.245.154:8080/subjects
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

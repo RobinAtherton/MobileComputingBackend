@@ -18,7 +18,6 @@ public class Login {
         return role;
     }
 
-
     public @NotNull String getEmail() {
         return email;
     }
