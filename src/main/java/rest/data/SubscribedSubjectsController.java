@@ -12,17 +12,15 @@ import rest.auth.Credentials;
 import java.sql.SQLException;
 
 @Controller
-public class SubjectController {
+public class SubscribedSubjectsController {
 
     @NotNull
     @ResponseBody
-    @RequestMapping(value="/subjects", method = RequestMethod.POST)
+    @RequestMapping(value="/subscriptions", method = RequestMethod.POST)
     public Subjects subjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
-        Subjects subjects = databaseManager.getAllSubjects(credentials.getEmail(), credentials.getPassword());
+        Subjects subjects = databaseManager.getSubscribedSubjectsForStudent(credentials.getEmail());
         return subjects;
     }
-
-
 }

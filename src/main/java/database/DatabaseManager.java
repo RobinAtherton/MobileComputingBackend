@@ -45,7 +45,8 @@ public class DatabaseManager {
      * @param password
      * @return
      */
-    public @NotNull String validateCredentials(@NotNull String email, @NotNull String password) throws SQLException {
+    public @NotNull
+    String validateCredentials(@NotNull String email, @NotNull String password) throws SQLException {
         final String sql = "SELECT Persons.PersonRole from Persons where Email = ? and PersonPassword = ?;";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, email);
@@ -58,7 +59,8 @@ public class DatabaseManager {
         }
     }
 
-    public @NotNull boolean validate(@NotNull String email, @NotNull String password) throws SQLException {
+    public @NotNull
+    boolean validate(@NotNull String email, @NotNull String password) throws SQLException {
         final String sql = "SELECT Persons.PersonRole from Persons where Email = ? and PersonPassword = ?;";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, email);
@@ -145,8 +147,64 @@ public class DatabaseManager {
         }
     }
 
+    public void subscribe(final @NotNull String studentMail, final @NotNull String password, final @NotNull String subjectName)
+            throws SQLException {
+        final String role = validateCredentials(studentMail, password);
+        if (!role.equals("student")) {
+            throw new IllegalArgumentException("subscriber is not of role student");
+        }
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement("insert into Subscription values(?, ?);");
+            statement.setString(1, studentMail);
+            statement.setString(2, subjectName);
+            statement.execute();
+        }
+
+    }
+
+    public void unsubscribe(final @NotNull String studentMail, final @NotNull String password, final @NotNull String subjectName)
+            throws SQLException {
+        final String role = validateCredentials(studentMail, password);
+        if (!role.equals("student")) {
+            throw new IllegalArgumentException("subscriber is not of role student");
+        }
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement =
+                    connection.prepareStatement("delete from Subscriptions where Subscriber = ? and Subject = ?");
+            statement.setString(1, studentMail);
+            statement.setString(2, subjectName);
+            statement.execute();
+        }
+    }
+
+    public @NotNull Subjects getSubscribedSubjectsForStudent(final @NotNull String studentMail) throws SQLException {
+        final ArrayList<Subject> subjects = new ArrayList<>();
+        final String sql =
+                "SELECT Subscription.SubjectName, from (Subscriptions join Subject on Subscriptions.SubjectName = Subject.SubjectName) where Subscriber = ?;";
+        try (Connection connection = connectToDatabase()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, studentMail);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                final int subjectId = resultSet.getInt(1);
+                final String subjectName = resultSet.getString(2);
+                final String subjectPassword = resultSet.getString(3);
+                final Subject subject = new Subject(subjectId, subjectName, subjectPassword);
+                subjects.add(subject);
+            }
+            final Subject[] subjectArray = new Subject[subjects.size()];
+            subjects.toArray(subjectArray);
+            return new Subjects(subjectArray);
+        }
+    }
+
+
     public @NotNull
     DataBase getDatabase() {
         return database;
+    }
+
+    private Connection connectToDatabase() {
+        return getDatabase().connect();
     }
 }

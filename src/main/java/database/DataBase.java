@@ -35,12 +35,15 @@ public class DataBase {
         dropAppointmentsTable();
         dropPersonsTable();
         dropSubjectsTable();
+        dropSubscriptionsTable();
     }
 
     public void createTables() {
         createPersonsTable();
         createSubjectsTable();
         createAppointmentsTable();
+        createSubscriptionTable();
+        createUniqueSubscriptionConstraint();
     }
 
     public Connection connect() {
@@ -87,6 +90,16 @@ public class DataBase {
         }
     }
 
+    private void dropSubscriptionsTable() {
+        String sql = "DROP TABLE Subscriptions";
+        try (Connection connection = this.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void createPersonsTable() {
         String sql = "CREATE TABLE Persons(" +
                 "  Email varchar(255)," +
@@ -125,6 +138,7 @@ public class DataBase {
                 "  AppointmentType varchar(255)," +
                 "  AppointmentTime varchar(255)," +
                 "  AppointmentDate varchar(255)," +
+                "  AppointmentDay varchar(255), " +
                 "  Primary Key(AppointmentId)," +
                 "  Foreign Key(SubjectKey) references Subjects(SubjectId)" +
                 ")";
@@ -135,4 +149,29 @@ public class DataBase {
             e.printStackTrace();
         }
     }
+
+    private void createSubscriptionTable() {
+        String sql = "CREATE TABLE Subscriptions(" +
+                " Subscriber varchar(255)," +
+                " SubjectName varchar(255)," +
+                " foreign key (Subscriber) references Persons(Email)," +
+                " foreign key (SubjectName) references Subjects(SubjectName)";
+        try (Connection connection = this.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createUniqueSubscriptionConstraint() {
+        String sql = "ALTER TABLE Subscriptions\n" +
+                "  ADD CONSTRAINT unique_subscribes unique(Subscriber, SubjectName);";
+        try (Connection connection = this.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
