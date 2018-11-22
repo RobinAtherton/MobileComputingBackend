@@ -32,10 +32,10 @@ public class DataBase {
     }
 
     public void dropTables() {
+        dropSubscriptionsTable();
         dropAppointmentsTable();
         dropPersonsTable();
         dropSubjectsTable();
-        dropSubscriptionsTable();
     }
 
     public void createTables() {
@@ -43,7 +43,6 @@ public class DataBase {
         createSubjectsTable();
         createAppointmentsTable();
         createSubscriptionTable();
-        createUniqueSubscriptionConstraint();
     }
 
     public Connection connect() {
@@ -116,8 +115,7 @@ public class DataBase {
     }
 
     private void createSubjectsTable() {
-        String sql = "" +
-                "CREATE TABLE Subjects(" +
+        String sql = "CREATE TABLE Subjects(" +
                 "  SubjectId serial," +
                 "  SubjectName varchar(255)," +
                 "  SubjectPassword varchar(255)," +
@@ -152,23 +150,16 @@ public class DataBase {
 
     private void createSubscriptionTable() {
         String sql = "CREATE TABLE Subscriptions(" +
+                " SubscriptionId serial ," +
                 " Subscriber varchar(255)," +
                 " SubjectName varchar(255)," +
-                " foreign key (Subscriber) references Persons(Email)," +
-                " foreign key (SubjectName) references Subjects(SubjectName)";
+                " Primary Key (Subscriber)," +
+                " Foreign key (Subscriber) references Persons(Email)," +
+                " Foreign key (SubscriptionId) references Subjects(SubjectId)" +
+                ")";
         try (Connection connection = this.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createUniqueSubscriptionConstraint() {
-        String sql = "ALTER TABLE Subscriptions\n" +
-                "  ADD CONSTRAINT unique_subscribes unique(Subscriber, SubjectName);";
-        try (Connection connection = this.connect()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }

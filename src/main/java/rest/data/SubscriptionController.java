@@ -18,6 +18,7 @@ public class SubscriptionController {
     public void subscribe(@RequestBody SubscriptionBody subscriptionBody) throws SQLException, ClassNotFoundException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.subscribe(subscriptionBody.getEmail(), subscriptionBody.getPassword(), subscriptionBody.getSubjectName());
+
     }
 
     @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)

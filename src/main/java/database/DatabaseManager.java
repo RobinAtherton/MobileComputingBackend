@@ -147,32 +147,43 @@ public class DatabaseManager {
         }
     }
 
-    public void subscribe(final @NotNull String studentMail, final @NotNull String password, final @NotNull String subjectName)
+    public void subscribe(final @NotNull String studentMail, final @NotNull String password, final String subjectName)
             throws SQLException {
         final String role = validateCredentials(studentMail, password);
-        if (!role.equals("student")) {
-            throw new IllegalArgumentException("subscriber is not of role student");
+        if (!role.equals("Student")) {
+            throw new IllegalArgumentException("subscriber is not of role Student");
         }
         try (Connection connection = this.database.connect()) {
-            PreparedStatement statement = connection.prepareStatement("insert into Subscription values(?, ?);");
-            statement.setString(1, studentMail);
-            statement.setString(2, subjectName);
+            PreparedStatement sql = connection.prepareStatement("select SubjectId from Subjects where SubjectName = ?;");
+            sql.setString(1, subjectName);
+            ResultSet resultSet = sql.executeQuery();
+            resultSet.next();
+            int subjectId = resultSet.getInt("SubjectId");
+            PreparedStatement statement = connection.prepareStatement("insert into Subscriptions values(?, ?, ?);");
+            statement.setInt(1, subjectId);
+            statement.setString(2, studentMail);
+            statement.setString(3, subjectName);
             statement.execute();
         }
 
     }
 
-    public void unsubscribe(final @NotNull String studentMail, final @NotNull String password, final @NotNull String subjectName)
+    public void unsubscribe(final @NotNull String studentMail, final @NotNull String password, final String subjectName)
             throws SQLException {
         final String role = validateCredentials(studentMail, password);
-        if (!role.equals("student")) {
+        if (!role.equals("Student")) {
             throw new IllegalArgumentException("subscriber is not of role student");
         }
         try (Connection connection = this.database.connect()) {
+            PreparedStatement sql = connection.prepareStatement("select SubjectId from Subjects where SubjectName = ?;");
+            sql.setString(1, subjectName);
+            ResultSet resultSet = sql.executeQuery();
+            resultSet.next();
+            int subjectId = resultSet.getInt("SubjectId");
             PreparedStatement statement =
-                    connection.prepareStatement("delete from Subscriptions where Subscriber = ? and Subject = ?");
+                    connection.prepareStatement("delete from Subscriptions where Subscriber = ? and SubscriptionId = ?");
             statement.setString(1, studentMail);
-            statement.setString(2, subjectName);
+            statement.setInt(2, subjectId);
             statement.execute();
         }
     }
