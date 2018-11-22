@@ -191,7 +191,7 @@ public class DatabaseManager {
     public @NotNull Subjects getSubscribedSubjectsForStudent(final @NotNull String studentMail) throws SQLException {
         final ArrayList<Subject> subjects = new ArrayList<>();
         final String sql =
-                "SELECT Subscription.SubjectName, from (Subscriptions join Subject on Subscriptions.SubjectName = Subject.SubjectName) where Subscriber = ?;";
+                "SELECT Subjects.SubjectId, Subjects.SubjectName, Subjects.SubjectPassword from (Subscriptions join Subjects on Subscriptions.SubscriptionId = Subjects.SubjectId) where Subscriptions.Subscriber = ?;";
         try (Connection connection = connectToDatabase()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, studentMail);

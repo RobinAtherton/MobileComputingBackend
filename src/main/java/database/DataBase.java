@@ -114,21 +114,6 @@ public class DataBase {
         }
     }
 
-    private void createSubjectsTable() {
-        String sql = "CREATE TABLE Subjects(" +
-                "  SubjectId serial," +
-                "  SubjectName varchar(255)," +
-                "  SubjectPassword varchar(255)," +
-                "  Primary Key(SubjectId)" +
-                ")";
-        try (Connection connection = this.connect()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void createAppointmentsTable() {
         String sql = "CREATE TABLE Appointments(" +
                 "  AppointmentId serial," +
@@ -156,6 +141,21 @@ public class DataBase {
                 " Primary Key (Subscriber)," +
                 " Foreign key (Subscriber) references Persons(Email)," +
                 " Foreign key (SubscriptionId) references Subjects(SubjectId)" +
+                ")";
+        try (Connection connection = this.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSubjectsTable() {
+        String sql = "CREATE TABLE Subjects(" +
+                "  SubjectId serial," +
+                "  SubjectName varchar(255)," +
+                "  SubjectPassword varchar(255)," +
+                "  Primary Key(SubjectId)" +
                 ")";
         try (Connection connection = this.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
