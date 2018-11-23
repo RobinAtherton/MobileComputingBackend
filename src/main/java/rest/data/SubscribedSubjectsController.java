@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import rest.auth.Credentials;
+import rest.data.jsonmodels.Subjects;
 
 import java.sql.SQLException;
 

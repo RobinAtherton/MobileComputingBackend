@@ -29,5 +29,9 @@ public class Setup {
         databaseManager.insertSubject("Programmieren I", "1234");
         databaseManager.insertSubject("Programmieren II", "1234");
         databaseManager.insertSubject("Programmieren III", "1234");
+        databaseManager.insertAppointment("Mathe I", "Once", "90", "17.11.2018", "Sat");
+        databaseManager.insertAppointment("Mathe I", "Once", "90", "19.11.2018", "Mon");
+        databaseManager.insertAppointment("Mathe I", "Once", "90", "20.11.2018", "Tue");
+
     }
 }

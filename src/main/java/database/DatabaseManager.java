@@ -1,10 +1,12 @@
 package database;
 
+import database.models.Appointment;
 import database.models.Subject;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rest.data.Subjects;
+import rest.data.jsonmodels.Appointments;
+import rest.data.jsonmodels.Subjects;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -133,14 +135,16 @@ public class DatabaseManager {
         }
     }
 
-    public void insertAppointment(int subjectKey, @NotNull String appointmentType, @NotNull String appointmentTime, @NotNull String appointmentDate) {
-        String sql = "INSERT INTO Appointments(SubjectKey, AppointmentType, AppointmentTime, AppointmentDate) VALUES (?, ?, ?, ?)";
+    public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDuration, @NotNull String appointmentDate, @NotNull String appointmentDay) {
+        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDuration, AppointmentDate, AppointmentDay) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = this.database.connect()) {
+            int subjectId = getSubjectIdForName(subjectName, connection);
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, subjectKey);
+            statement.setInt(1, subjectId);
             statement.setString(2, appointmentType);
-            statement.setString(3, appointmentTime);
+            statement.setString(3, appointmentDuration);
             statement.setString(4, appointmentDate);
+            statement.setString(5, appointmentDay);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -154,11 +158,7 @@ public class DatabaseManager {
             throw new IllegalArgumentException("subscriber is not of role Student");
         }
         try (Connection connection = this.database.connect()) {
-            PreparedStatement sql = connection.prepareStatement("select SubjectId from Subjects where SubjectName = ?;");
-            sql.setString(1, subjectName);
-            ResultSet resultSet = sql.executeQuery();
-            resultSet.next();
-            int subjectId = resultSet.getInt("SubjectId");
+            int subjectId = getSubjectIdForName(subjectName, connection);
             PreparedStatement statement = connection.prepareStatement("insert into Subscriptions values(?, ?, ?);");
             statement.setInt(1, subjectId);
             statement.setString(2, studentMail);
@@ -168,6 +168,14 @@ public class DatabaseManager {
 
     }
 
+    private int getSubjectIdForName(String subjectName, Connection connection) throws SQLException {
+        PreparedStatement sql = connection.prepareStatement("select SubjectId from Subjects where SubjectName = ?;");
+        sql.setString(1, subjectName);
+        ResultSet resultSet = sql.executeQuery();
+        resultSet.next();
+        return resultSet.getInt("SubjectId");
+    }
+
     public void unsubscribe(final @NotNull String studentMail, final @NotNull String password, final String subjectName)
             throws SQLException {
         final String role = validateCredentials(studentMail, password);
@@ -175,11 +183,7 @@ public class DatabaseManager {
             throw new IllegalArgumentException("subscriber is not of role student");
         }
         try (Connection connection = this.database.connect()) {
-            PreparedStatement sql = connection.prepareStatement("select SubjectId from Subjects where SubjectName = ?;");
-            sql.setString(1, subjectName);
-            ResultSet resultSet = sql.executeQuery();
-            resultSet.next();
-            int subjectId = resultSet.getInt("SubjectId");
+            int subjectId = getSubjectIdForName(subjectName, connection);
             PreparedStatement statement =
                     connection.prepareStatement("delete from Subscriptions where Subscriber = ? and SubscriptionId = ?");
             statement.setString(1, studentMail);
@@ -188,7 +192,8 @@ public class DatabaseManager {
         }
     }
 
-    public @NotNull Subjects getSubscribedSubjectsForStudent(final @NotNull String studentMail) throws SQLException {
+    public @NotNull
+    Subjects getSubscribedSubjectsForStudent(final @NotNull String studentMail) throws SQLException {
         final ArrayList<Subject> subjects = new ArrayList<>();
         final String sql =
                 "SELECT Subjects.SubjectId, Subjects.SubjectName, Subjects.SubjectPassword from (Subscriptions join Subjects on Subscriptions.SubscriptionId = Subjects.SubjectId) where Subscriptions.Subscriber = ?;";
@@ -207,6 +212,30 @@ public class DatabaseManager {
             subjects.toArray(subjectArray);
             return new Subjects(subjectArray);
         }
+    }
+
+
+    public @NotNull
+    Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {
+        final ArrayList<Appointment> appointments = new ArrayList<>();
+        final String sql = "SELECT Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate," +
+                " Appointments.AppointmentDay FROM Appointments JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId "+
+                "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId WHERE Subscriptions.Subscriber = ?;";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, studentMail);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                final int appointmentId = resultSet.getInt(1);
+                final String appointmentType = resultSet.getString(3);
+
+                //final Appointment appointment = new Appointment();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

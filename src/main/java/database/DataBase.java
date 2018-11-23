@@ -117,13 +117,13 @@ public class DataBase {
     private void createAppointmentsTable() {
         String sql = "CREATE TABLE Appointments(" +
                 "  AppointmentId serial," +
-                "  SubjectKey int," +
+                "  SubjectId int," +
                 "  AppointmentType varchar(255)," +
-                "  AppointmentTime varchar(255)," +
+                "  AppointmentDuration varchar(255)," +
                 "  AppointmentDate varchar(255)," +
                 "  AppointmentDay varchar(255), " +
                 "  Primary Key(AppointmentId)," +
-                "  Foreign Key(SubjectKey) references Subjects(SubjectId)" +
+                "  Foreign Key(SubjectId) references Subjects(SubjectId)" +
                 ")";
         try (Connection connection = this.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);

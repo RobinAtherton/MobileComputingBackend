@@ -1,4 +1,4 @@
-package rest.data;
+package rest.data.jsonmodels;
 
 import database.models.Subject;
 
