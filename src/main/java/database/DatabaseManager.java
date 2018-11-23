@@ -2,6 +2,7 @@ package database;
 
 import database.models.Appointment;
 import database.models.Subject;
+import database.models.enums.AppointmentType;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -218,24 +219,48 @@ public class DatabaseManager {
     public @NotNull
     Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {
         final ArrayList<Appointment> appointments = new ArrayList<>();
-        final String sql = "SELECT Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate," +
-                " Appointments.AppointmentDay FROM Appointments JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId "+
-                "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId WHERE Subscriptions.Subscriber = ?;";
+        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay \n" +
+                "FROM Appointments \n" +
+                "JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId \n" +
+                "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId \n" +
+                "WHERE Subscriptions.Subscriber = ?";
         try (Connection connection = this.database.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, studentMail);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                final int appointmentId = resultSet.getInt(1);
-                final String appointmentType = resultSet.getString(3);
-
-                //final Appointment appointment = new Appointment();
+                int appointmentId = resultSet.getInt(1);
+                String subjectName = resultSet.getString(2);
+                AppointmentType appointmentType;
+                appointmentType = convertAppointmentType(resultSet);
+                String appointmentDuration = resultSet.getString(4);
+                String appointmentDate = resultSet.getString(5);
+                String appointmentDay = resultSet.getString(6);
+                Appointment appointment = new Appointment(appointmentId, subjectName, appointmentType, appointmentDuration, appointmentDate, appointmentDay);
+                appointments.add(appointment);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        final Appointment[] appointmentArray = new Appointment[appointments.size()];
+        appointments.toArray(appointmentArray);
+        return new Appointments(appointmentArray);
+    }
+
+    @NotNull
+    private AppointmentType convertAppointmentType(ResultSet resultSet) throws SQLException {
+        AppointmentType appointmentType;
+        if (resultSet.getString(3).equals("Once")) {
+            appointmentType = AppointmentType.Once;
+        } else if (resultSet.getString(3).equals("Weekly")) {
+            appointmentType = AppointmentType.Weekly;
+        } else if (resultSet.getString(3).equals("Biweekly")) {
+            appointmentType = AppointmentType.Biweekly;
+        } else {
+            appointmentType = AppointmentType.Once;
+        }
+        return appointmentType;
     }
 
 

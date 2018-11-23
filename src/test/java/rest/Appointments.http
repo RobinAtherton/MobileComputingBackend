@@ -1,12 +1,12 @@
-POST http://192.168.0.3:8080/subscriptions
+POST http://192.168.0.3:8080/subscribedAppointments
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 data: jsonString
 
 {
-"email": "test",
-"password": "test"
+  "email": "test",
+  "password": "test"
 }
 
 ###

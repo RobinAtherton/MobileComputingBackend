@@ -9,15 +9,19 @@ import org.jetbrains.annotations.NotNull;
 public class Appointment {
 
     private int id;
-    private int subject;
+    private String subjectName;
     private @NotNull AppointmentType type;
     private @NotNull String appointmentDate;
+    private @NotNull String appointmentDuration;
+    private @NotNull String appointmentDay;
 
-    public Appointment(int id, int subject, @NotNull AppointmentType type, @NotNull String appointmentDate) {
+    public Appointment(int id, String subjectName, @NotNull AppointmentType type, @NotNull String appointmentDate, @NotNull String appointmentDuration, @NotNull String appointmentDay) {
         this.id = id;
-        this.subject = subject;
+        this.subjectName = subjectName;
         this.type = type;
         this.appointmentDate = appointmentDate;
+        this.appointmentDuration = appointmentDuration;
+        this.appointmentDay = appointmentDay;
     }
 
     public int getId() {
@@ -28,15 +32,16 @@ public class Appointment {
         this.id = id;
     }
 
-    public int getSubject() {
-        return subject;
+    public String getSubjectName() {
+        return subjectName;
     }
 
-    public void setSubject(int subject) {
-        this.subject = subject;
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
 
-    public @NotNull AppointmentType getType() {
+    @NotNull
+    public AppointmentType getType() {
         return type;
     }
 
@@ -44,11 +49,30 @@ public class Appointment {
         this.type = type;
     }
 
-    public @NotNull String getAppointmentDate() {
+    @NotNull
+    public String getAppointmentDate() {
         return appointmentDate;
     }
 
     public void setAppointmentDate(@NotNull String appointmentDate) {
         this.appointmentDate = appointmentDate;
+    }
+
+    @NotNull
+    public String getAppointmentDuration() {
+        return appointmentDuration;
+    }
+
+    public void setAppointmentDuration(@NotNull String appointmentDuration) {
+        this.appointmentDuration = appointmentDuration;
+    }
+
+    @NotNull
+    public String getAppointmentDay() {
+        return appointmentDay;
+    }
+
+    public void setAppointmentDay(@NotNull String appointmentDay) {
+        this.appointmentDay = appointmentDay;
     }
 }

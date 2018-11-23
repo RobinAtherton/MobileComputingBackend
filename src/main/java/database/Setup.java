@@ -10,12 +10,13 @@ import java.sql.SQLException;
  */
 public class Setup {
 
-    public static void main(String[] args) throws ClassNotFoundException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().dropTables();
         databaseManager.getDatabase().createTables();
         databaseManager.insertPerson("s-rather@haw-landshut.de", "1234", Role.Student);
         databaseManager.insertPerson("test", "test", Role.Student);
+        databaseManager.insertPerson("testL", "testL", Role.Lecturer);
         databaseManager.insertPerson("testA", "testA", Role.Admin);
         databaseManager.insertSubject("Mathe II", "1234");
         databaseManager.insertSubject("Mathe I", "123");
@@ -32,6 +33,7 @@ public class Setup {
         databaseManager.insertAppointment("Mathe I", "Once", "90", "17.11.2018", "Sat");
         databaseManager.insertAppointment("Mathe I", "Once", "90", "19.11.2018", "Mon");
         databaseManager.insertAppointment("Mathe I", "Once", "90", "20.11.2018", "Tue");
+        databaseManager.subscribe("test", "test", "Mathe I");
 
     }
 }
