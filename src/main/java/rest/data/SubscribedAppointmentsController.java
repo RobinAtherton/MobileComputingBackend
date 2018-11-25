@@ -28,4 +28,5 @@ public class SubscribedAppointmentsController {
         Appointments appointments= databaseManager.getAppointmentsForSubscribedSubjects(credentials.getEmail());
         return appointments;
     }
+
 }

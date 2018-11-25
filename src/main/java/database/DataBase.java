@@ -122,6 +122,7 @@ public class DataBase {
                 "  AppointmentDuration varchar(255)," +
                 "  AppointmentDate varchar(255)," +
                 "  AppointmentDay varchar(255), " +
+                "  TimeSlot varchar(255)," +
                 "  Primary Key(AppointmentId)," +
                 "  Foreign Key(SubjectId) references Subjects(SubjectId)" +
                 ")";

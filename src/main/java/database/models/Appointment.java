@@ -14,14 +14,16 @@ public class Appointment {
     private @NotNull String appointmentDate;
     private @NotNull String appointmentDuration;
     private @NotNull String appointmentDay;
+    private @NotNull String timeSlot;
 
-    public Appointment(int id, String subjectName, @NotNull AppointmentType type, @NotNull String appointmentDate, @NotNull String appointmentDuration, @NotNull String appointmentDay) {
+    public Appointment(int id, String subjectName, @NotNull AppointmentType type, @NotNull String appointmentDate, @NotNull String appointmentDuration, @NotNull String appointmentDay, @NotNull String timeSlot) {
         this.id = id;
         this.subjectName = subjectName;
         this.type = type;
         this.appointmentDate = appointmentDate;
         this.appointmentDuration = appointmentDuration;
         this.appointmentDay = appointmentDay;
+        this.timeSlot = timeSlot;
     }
 
     public int getId() {
@@ -74,5 +76,14 @@ public class Appointment {
 
     public void setAppointmentDay(@NotNull String appointmentDay) {
         this.appointmentDay = appointmentDay;
+    }
+
+    @NotNull
+    public String getTimeSlot() {
+        return timeSlot;
+    }
+
+    public void setTimeSlot(@NotNull String timeSlot) {
+        this.timeSlot = timeSlot;
     }
 }

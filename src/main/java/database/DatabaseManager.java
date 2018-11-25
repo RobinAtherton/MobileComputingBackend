@@ -136,8 +136,8 @@ public class DatabaseManager {
         }
     }
 
-    public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDuration, @NotNull String appointmentDate, @NotNull String appointmentDay) {
-        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDuration, AppointmentDate, AppointmentDay) VALUES (?, ?, ?, ?, ?)";
+    public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDuration, @NotNull String appointmentDate, @NotNull String appointmentDay, @NotNull String timeSlot) {
+        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDuration, AppointmentDate, AppointmentDay, TimeSlot) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = this.database.connect()) {
             int subjectId = getSubjectIdForName(subjectName, connection);
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -146,6 +146,7 @@ public class DatabaseManager {
             statement.setString(3, appointmentDuration);
             statement.setString(4, appointmentDate);
             statement.setString(5, appointmentDay);
+            statement.setString(6, timeSlot);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -216,10 +217,9 @@ public class DatabaseManager {
     }
 
 
-    public @NotNull
-    Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {
+    public @NotNull Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {
         final ArrayList<Appointment> appointments = new ArrayList<>();
-        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay \n" +
+        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay, Appointments.TimeSlot \n" +
                 "FROM Appointments \n" +
                 "JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId \n" +
                 "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId \n" +
@@ -228,17 +228,7 @@ public class DatabaseManager {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, studentMail);
             ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                int appointmentId = resultSet.getInt(1);
-                String subjectName = resultSet.getString(2);
-                AppointmentType appointmentType;
-                appointmentType = convertAppointmentType(resultSet);
-                String appointmentDuration = resultSet.getString(4);
-                String appointmentDate = resultSet.getString(5);
-                String appointmentDay = resultSet.getString(6);
-                Appointment appointment = new Appointment(appointmentId, subjectName, appointmentType, appointmentDuration, appointmentDate, appointmentDay);
-                appointments.add(appointment);
-            }
+            extractAppointments(appointments, resultSet);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -247,6 +237,44 @@ public class DatabaseManager {
         appointments.toArray(appointmentArray);
         return new Appointments(appointmentArray);
     }
+
+    public @NotNull Appointments getAppointmentsForDay(final @NotNull String studentMail, final @NotNull String day) {
+        final ArrayList<Appointment> appointments = new ArrayList<>();
+        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay, Appointments.TimeSlot \n" +
+                "FROM Appointments \n" +
+                "JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId \n" +
+                "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId \n" +
+                "WHERE Subscriptions.Subscriber = ? AND Appointments.AppointmentDay = ?";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, studentMail);
+            statement.setString(2, day);
+            ResultSet resultSet = statement.executeQuery();
+            extractAppointments(appointments, resultSet);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        final Appointment[] appointmentArray = new Appointment[appointments.size()];
+        appointments.toArray(appointmentArray);
+        return new Appointments(appointmentArray);
+    }
+
+    private void extractAppointments(ArrayList<Appointment> appointments, ResultSet resultSet) throws SQLException {
+        while (resultSet.next()) {
+            int appointmentId = resultSet.getInt(1);
+            String subjectName = resultSet.getString(2);
+            AppointmentType appointmentType;
+            appointmentType = convertAppointmentType(resultSet);
+            String appointmentDuration = resultSet.getString(4);
+            String appointmentDate = resultSet.getString(5);
+            String appointmentDay = resultSet.getString(6);
+            String timeSlot = resultSet.getString(7);
+            Appointment appointment = new Appointment(appointmentId, subjectName, appointmentType, appointmentDuration, appointmentDate, appointmentDay, timeSlot);
+            appointments.add(appointment);
+        }
+    }
+
 
     @NotNull
     private AppointmentType convertAppointmentType(ResultSet resultSet) throws SQLException {
