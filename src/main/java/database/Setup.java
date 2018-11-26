@@ -30,9 +30,12 @@ public class Setup {
         databaseManager.insertSubject("Programmieren I", "1234");
         databaseManager.insertSubject("Programmieren II", "1234");
         databaseManager.insertSubject("Programmieren III", "1234");
-        databaseManager.insertAppointment("Mathe I", "Once", "90", "19.11.2018", "Mon", "8:45 - 10:15");
-        databaseManager.insertAppointment("Mathe I", "Once", "90", "20.11.2018", "Tue", "8:45 - 10:15");
+        databaseManager.insertAppointment("Mathe I", "Once","19.11.2018", "Mon", "8:45 - 10:15");
+        databaseManager.insertAppointment("Mathe I", "Once", "20.11.2018", "Tue", "8:45 - 10:15");
+        databaseManager.insertAppointment("Mathe II", "Once","20.11.2018", "Mon", "10:30 - 12:00");
+        databaseManager.insertAppointment("Mathe II", "Once","20.11.2018", "Tue", "10:30 - 12:00");
         databaseManager.subscribe("test", "test", "Mathe I");
+        databaseManager.subscribe("test", "test", "Mathe II");
 
     }
 }

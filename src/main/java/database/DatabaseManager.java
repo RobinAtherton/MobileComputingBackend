@@ -76,20 +76,6 @@ public class DatabaseManager {
         }
     }
 
-    public Subject getSubject(@NotNull int subjectId) throws SQLException {
-        final String sql = "SELECT Subjects from Subjects where SubjectId = ?;";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, subjectId);
-        final ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            int id = Integer.parseInt(resultSet.getString(1));
-            String name = resultSet.getString(2);
-            String password = resultSet.getString(3);
-            return new Subject(id, name, password);
-        }
-        return null;
-    }
-
     public Subjects getAllSubjects(@NotNull String email, @NotNull String password) throws SQLException {
         if (validate(email, password)) {
             final String sql = "SELECT * from Subjects;";
@@ -136,21 +122,36 @@ public class DatabaseManager {
         }
     }
 
-    public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDuration, @NotNull String appointmentDate, @NotNull String appointmentDay, @NotNull String timeSlot) {
-        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDuration, AppointmentDate, AppointmentDay, TimeSlot) VALUES (?, ?, ?, ?, ?, ?)";
+    public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDate, @NotNull String appointmentDay, @NotNull String timeSlot) {
+        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDate, AppointmentDay, TimeSlot, Ordinality) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = this.database.connect()) {
             int subjectId = getSubjectIdForName(subjectName, connection);
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, subjectId);
             statement.setString(2, appointmentType);
-            statement.setString(3, appointmentDuration);
-            statement.setString(4, appointmentDate);
-            statement.setString(5, appointmentDay);
-            statement.setString(6, timeSlot);
+            statement.setString(3, appointmentDate);
+            statement.setString(4, appointmentDay);
+            statement.setString(5, timeSlot);
+            statement.setInt(6, assertOrdinality(timeSlot));
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int assertOrdinality(@NotNull final String timeSlot) {
+        if (timeSlot.equals("8:45 - 10:15")) {
+            return 0;
+        } else if (timeSlot.equals("10:30 - 12:00")){
+            return 1;
+        } else if (timeSlot.equals("12:50 - 14:20")) {
+            return 2;
+        } else if (timeSlot.equals("14:30 - 16:00")) {
+            return 3;
+        } else if (timeSlot.equals("16:10 - 17:40")) {
+            return 4;
+        }
+        return -1;
     }
 
     public void subscribe(final @NotNull String studentMail, final @NotNull String password, final String subjectName)
@@ -216,10 +217,9 @@ public class DatabaseManager {
         }
     }
 
-
     public @NotNull Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {
         final ArrayList<Appointment> appointments = new ArrayList<>();
-        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay, Appointments.TimeSlot \n" +
+        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDate,Appointments.AppointmentDay, Appointments.TimeSlot, Appointments.Ordinality \n" +
                 "FROM Appointments \n" +
                 "JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId \n" +
                 "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId \n" +
@@ -238,27 +238,6 @@ public class DatabaseManager {
         return new Appointments(appointmentArray);
     }
 
-    public @NotNull Appointments getAppointmentsForDay(final @NotNull String studentMail, final @NotNull String day) {
-        final ArrayList<Appointment> appointments = new ArrayList<>();
-        final String sql = "SELECT Appointments.AppointmentId, Subjects.SubjectName, Appointments.AppointmentType, Appointments.AppointmentDuration, Appointments.AppointmentDate,Appointments.AppointmentDay, Appointments.TimeSlot \n" +
-                "FROM Appointments \n" +
-                "JOIN Subjects on Subjects.SubjectId = Appointments.SubjectId \n" +
-                "JOIN Subscriptions on Subscriptions.SubscriptionId = Appointments.SubjectId \n" +
-                "WHERE Subscriptions.Subscriber = ? AND Appointments.AppointmentDay = ?";
-        try (Connection connection = this.database.connect()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, studentMail);
-            statement.setString(2, day);
-            ResultSet resultSet = statement.executeQuery();
-            extractAppointments(appointments, resultSet);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        final Appointment[] appointmentArray = new Appointment[appointments.size()];
-        appointments.toArray(appointmentArray);
-        return new Appointments(appointmentArray);
-    }
 
     private void extractAppointments(ArrayList<Appointment> appointments, ResultSet resultSet) throws SQLException {
         while (resultSet.next()) {
@@ -266,11 +245,11 @@ public class DatabaseManager {
             String subjectName = resultSet.getString(2);
             AppointmentType appointmentType;
             appointmentType = convertAppointmentType(resultSet);
-            String appointmentDuration = resultSet.getString(4);
-            String appointmentDate = resultSet.getString(5);
-            String appointmentDay = resultSet.getString(6);
-            String timeSlot = resultSet.getString(7);
-            Appointment appointment = new Appointment(appointmentId, subjectName, appointmentType, appointmentDuration, appointmentDate, appointmentDay, timeSlot);
+            String appointmentDate = resultSet.getString(4);
+            String appointmentDay = resultSet.getString(5);
+            String timeSlot = resultSet.getString(6);
+            int ordinality = resultSet.getInt(7);
+            Appointment appointment = new Appointment(appointmentId, subjectName, appointmentType, appointmentDate, appointmentDay, timeSlot, ordinality);
             appointments.add(appointment);
         }
     }

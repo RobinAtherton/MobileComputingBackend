@@ -119,10 +119,10 @@ public class DataBase {
                 "  AppointmentId serial," +
                 "  SubjectId int," +
                 "  AppointmentType varchar(255)," +
-                "  AppointmentDuration varchar(255)," +
                 "  AppointmentDate varchar(255)," +
                 "  AppointmentDay varchar(255), " +
                 "  TimeSlot varchar(255)," +
+                "  Ordinality int," +
                 "  Primary Key(AppointmentId)," +
                 "  Foreign Key(SubjectId) references Subjects(SubjectId)" +
                 ")";
@@ -139,7 +139,7 @@ public class DataBase {
                 " SubscriptionId serial ," +
                 " Subscriber varchar(255)," +
                 " SubjectName varchar(255)," +
-                " Primary Key (Subscriber)," +
+                " Primary Key (SubscriptionId)," +
                 " Foreign key (Subscriber) references Persons(Email)," +
                 " Foreign key (SubscriptionId) references Subjects(SubjectId)" +
                 ")";

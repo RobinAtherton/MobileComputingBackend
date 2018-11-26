@@ -12,18 +12,20 @@ public class Appointment {
     private String subjectName;
     private @NotNull AppointmentType type;
     private @NotNull String appointmentDate;
-    private @NotNull String appointmentDuration;
     private @NotNull String appointmentDay;
     private @NotNull String timeSlot;
+    private int ordinality;
 
-    public Appointment(int id, String subjectName, @NotNull AppointmentType type, @NotNull String appointmentDate, @NotNull String appointmentDuration, @NotNull String appointmentDay, @NotNull String timeSlot) {
+    public Appointment(int id, String subjectName, @NotNull AppointmentType type, @NotNull String appointmentDate,
+                       @NotNull String appointmentDay, @NotNull String timeSlot,
+                        int ordinality) {
         this.id = id;
         this.subjectName = subjectName;
         this.type = type;
         this.appointmentDate = appointmentDate;
-        this.appointmentDuration = appointmentDuration;
         this.appointmentDay = appointmentDay;
         this.timeSlot = timeSlot;
+        this.ordinality = ordinality;
     }
 
     public int getId() {
@@ -60,14 +62,6 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
-    @NotNull
-    public String getAppointmentDuration() {
-        return appointmentDuration;
-    }
-
-    public void setAppointmentDuration(@NotNull String appointmentDuration) {
-        this.appointmentDuration = appointmentDuration;
-    }
 
     @NotNull
     public String getAppointmentDay() {
@@ -85,5 +79,9 @@ public class Appointment {
 
     public void setTimeSlot(@NotNull String timeSlot) {
         this.timeSlot = timeSlot;
+    }
+
+    public int getOrdinality() {
+        return ordinality;
     }
 }
