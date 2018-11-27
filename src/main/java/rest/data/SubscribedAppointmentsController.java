@@ -2,6 +2,8 @@ package rest.data;
 
 import database.DatabaseManager;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,8 @@ import java.sql.SQLException;
 @Controller
 public class SubscribedAppointmentsController {
 
+    Logger logger = LoggerFactory.getLogger(SubscribedAppointmentsController.class);
+
     @NotNull
     @ResponseBody
     @RequestMapping(value="/subscribedAppointments", method = RequestMethod.POST)
@@ -26,6 +30,7 @@ public class SubscribedAppointmentsController {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
         Appointments appointments= databaseManager.getAppointmentsForSubscribedSubjects(credentials.getEmail());
+        logger.info(credentials.getEmail() + " requested appointments");
         return appointments;
     }
 

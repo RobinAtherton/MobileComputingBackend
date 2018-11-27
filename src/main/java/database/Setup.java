@@ -16,8 +16,8 @@ public class Setup {
         databaseManager.getDatabase().createTables();
         databaseManager.insertPerson("s-rather@haw-landshut.de", "1234", Role.Student);
         databaseManager.insertPerson("test", "test", Role.Student);
-        databaseManager.insertPerson("testL", "testL", Role.Lecturer);
-        databaseManager.insertPerson("testA", "testA", Role.Admin);
+        databaseManager.insertPerson("testL", "test", Role.Lecturer);
+        databaseManager.insertPerson("testA", "test", Role.Admin);
         databaseManager.insertSubject("Mathe II", "1234");
         databaseManager.insertSubject("Mathe I", "123");
         databaseManager.insertSubject("Vertiefung Datenbanken", "1234");

@@ -5,7 +5,7 @@ Content-Type: application/json
 data: jsonString
 
 {
-"email": "test",
+"email": "testL",
 "password": "test"
 }
 
