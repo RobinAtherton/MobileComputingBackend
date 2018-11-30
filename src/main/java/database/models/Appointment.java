@@ -62,7 +62,6 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
-
     @NotNull
     public String getAppointmentDay() {
         return appointmentDay;

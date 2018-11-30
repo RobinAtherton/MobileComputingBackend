@@ -78,26 +78,6 @@ public class DatabaseManager {
         }
     }
 
-//    public Subjects getAllSubjects(@NotNull String email, @NotNull String password) throws SQLException {
-//        if (validate(email, password)) {
-//            final String sql = "SELECT * from Subjects;";
-//            PreparedStatement statement = connection.prepareStatement(sql);
-//            final ResultSet resultSet = statement.executeQuery();
-//            List<Subject> subjects = new ArrayList<>();
-//            int i = 0;
-//            while (resultSet.next()) {
-//                int id = Integer.parseInt(resultSet.getString(1));
-//                String subjectName = resultSet.getString(2);
-//                String subjectPassword = resultSet.getString(3);
-//                subjects.add(new Subject(id, subjectName, subjectPassword));
-//            }
-//            final Subject[] subjectArray = new Subject[subjects.size()];
-//            subjects.toArray(subjectArray);
-//            return new Subjects(subjectArray);
-//        }
-//        throw new SQLException("User not validated");
-//    }
-
     public void insertPerson(@NotNull String email, @NotNull String password, @NotNull Role role) {
         String sql = "INSERT INTO Persons(Email, PersonPassword, PersonRole) VALUES(?,?,?)";
         try (Connection connection = this.database.connect()) {
@@ -285,18 +265,17 @@ public class DatabaseManager {
         }
     }
 
-
     @NotNull
     private AppointmentType convertAppointmentType(ResultSet resultSet) throws SQLException {
         AppointmentType appointmentType;
-        if (resultSet.getString(3).equals("Once")) {
-            appointmentType = AppointmentType.Once;
-        } else if (resultSet.getString(3).equals("Weekly")) {
-            appointmentType = AppointmentType.Weekly;
-        } else if (resultSet.getString(3).equals("Biweekly")) {
-            appointmentType = AppointmentType.Biweekly;
+        if (resultSet.getString(3).equals("einmalig")) {
+            appointmentType = AppointmentType.einmalig;
+        } else if (resultSet.getString(3).equals("gerade")) {
+            appointmentType = AppointmentType.gerade;
+        } else if (resultSet.getString(3).equals("ungerade")) {
+            appointmentType = AppointmentType.ungerade;
         } else {
-            appointmentType = AppointmentType.Once;
+            appointmentType = AppointmentType.einmalig;
         }
         return appointmentType;
     }
