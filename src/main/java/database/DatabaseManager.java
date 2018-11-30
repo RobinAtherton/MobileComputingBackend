@@ -208,6 +208,7 @@ public class DatabaseManager {
                 final int subjectId = resultSet.getInt(1);
                 final String subjectName = resultSet.getString(2);
                 final String subjectPassword = resultSet.getString(3);
+
                 final Subject subject = new Subject(subjectId, subjectName, subjectPassword);
                 subjects.add(subject);
             }

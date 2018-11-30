@@ -1,4 +1,4 @@
-package rest.data;
+package rest.data.jsonmodels;
 
 public class SubscriptionBody {
 
