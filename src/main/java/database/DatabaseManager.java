@@ -6,6 +6,7 @@ import database.models.enums.AppointmentType;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rest.auth.Credentials;
 import rest.data.jsonmodels.Appointments;
 import rest.data.jsonmodels.Subjects;
 
@@ -14,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DatabaseManager {
@@ -76,25 +78,25 @@ public class DatabaseManager {
         }
     }
 
-    public Subjects getAllSubjects(@NotNull String email, @NotNull String password) throws SQLException {
-        if (validate(email, password)) {
-            final String sql = "SELECT * from Subjects;";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            final ResultSet resultSet = statement.executeQuery();
-            List<Subject> subjects = new ArrayList<>();
-            int i = 0;
-            while (resultSet.next()) {
-                int id = Integer.parseInt(resultSet.getString(1));
-                String subjectName = resultSet.getString(2);
-                String subjectPassword = resultSet.getString(3);
-                subjects.add(new Subject(id, subjectName, subjectPassword));
-            }
-            final Subject[] subjectArray = new Subject[subjects.size()];
-            subjects.toArray(subjectArray);
-            return new Subjects(subjectArray);
-        }
-        throw new SQLException("User not validated");
-    }
+//    public Subjects getAllSubjects(@NotNull String email, @NotNull String password) throws SQLException {
+//        if (validate(email, password)) {
+//            final String sql = "SELECT * from Subjects;";
+//            PreparedStatement statement = connection.prepareStatement(sql);
+//            final ResultSet resultSet = statement.executeQuery();
+//            List<Subject> subjects = new ArrayList<>();
+//            int i = 0;
+//            while (resultSet.next()) {
+//                int id = Integer.parseInt(resultSet.getString(1));
+//                String subjectName = resultSet.getString(2);
+//                String subjectPassword = resultSet.getString(3);
+//                subjects.add(new Subject(id, subjectName, subjectPassword));
+//            }
+//            final Subject[] subjectArray = new Subject[subjects.size()];
+//            subjects.toArray(subjectArray);
+//            return new Subjects(subjectArray);
+//        }
+//        throw new SQLException("User not validated");
+//    }
 
     public void insertPerson(@NotNull String email, @NotNull String password, @NotNull Role role) {
         String sql = "INSERT INTO Persons(Email, PersonPassword, PersonRole) VALUES(?,?,?)";
@@ -208,14 +210,42 @@ public class DatabaseManager {
                 final int subjectId = resultSet.getInt(1);
                 final String subjectName = resultSet.getString(2);
                 final String subjectPassword = resultSet.getString(3);
-
-                final Subject subject = new Subject(subjectId, subjectName, subjectPassword);
+                final Subject subject = new Subject(subjectId, subjectName, subjectPassword, true);
                 subjects.add(subject);
             }
             final Subject[] subjectArray = new Subject[subjects.size()];
             subjects.toArray(subjectArray);
             return new Subjects(subjectArray);
         }
+    }
+
+    public @NotNull Subjects getAllSubjectsForStudent(final @NotNull String email, final @NotNull String password)
+            throws SQLException {
+            final String sql = "select Subjects.SubjectId, Subjects.SubjectName, Subjects.SubjectPassword, Subscriptions.Subscriber \n" +
+                    "from Subscriptions right join Subjects on Subjects.SubjectName = Subscriptions.SubjectName \n" +
+                    "where Subscriber = ? or Subscriber is null";
+        final String role = validateCredentials(email, password);
+        if (!role.equals("Student")) {
+            throw new IllegalArgumentException("user is not of role student");
+        }
+        final LinkedList<Subject> subjects = new LinkedList<>();
+        try (Connection connection = connectToDatabase()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, email);
+            final ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()) {
+                final int subjectId = resultSet.getInt(1);
+                final String subjectName = resultSet.getString(2);
+                final String subjectPassword = resultSet.getString(3);
+                final boolean subscribed = resultSet.getString(4) != null;
+                subjects.add(new Subject(subjectId, subjectName, subjectPassword, subscribed));
+            }
+            final Subject[] subjectArray = new Subject[subjects.size()];
+            subjects.toArray(subjectArray);
+            return new Subjects(subjectArray);
+        }
+
+
     }
 
     public @NotNull Appointments getAppointmentsForSubscribedSubjects(final @NotNull String studentMail) {

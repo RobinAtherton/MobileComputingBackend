@@ -21,7 +21,7 @@ public class SubjectController {
     public Subjects subjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
-        Subjects subjects = databaseManager.getAllSubjects(credentials.getEmail(), credentials.getPassword());
+        Subjects subjects = databaseManager.getAllSubjectsForStudent(credentials.getEmail(), credentials.getPassword());
         return subjects;
     }
 
