@@ -183,8 +183,8 @@ public class DataBase {
     private void createOwnsTable() {
         String sql ="CREATE TABLE Owns(" +
                 " OwnerId serial," +
-                " Lecturer varchar(255) unique," +
-                " SubjectName varchar(255) unique," +
+                " Lecturer varchar(255)," +
+                " SubjectName varchar(255)," +
                 " UNIQUE(SubjectName)," +
                 " Primary Key(OwnerId)," +
                 " Foreign Key(SubjectName) references Subjects(SubjectName)," +
