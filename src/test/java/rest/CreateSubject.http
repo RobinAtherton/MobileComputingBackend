@@ -8,7 +8,7 @@ data: jsonString
   "email": "testL",
   "password": "test",
   "subjectName": "XD",
-  "subjectPassword": "Wabern"
+  "subjectPassword": null
 }
 
 ###

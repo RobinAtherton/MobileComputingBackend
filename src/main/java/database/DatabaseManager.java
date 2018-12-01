@@ -90,14 +90,36 @@ public class DatabaseManager {
         }
     }
 
-    public boolean insertSubject(@NotNull String email, @NotNull String password, @NotNull String subjectName, @NotNull String subjectPassword) throws SQLException {
-        String sql = "INSERT INTO Subjects(SubjectName, SubjectPassword) VALUES(?, ?)";
+    public boolean insertSubject(@NotNull String email, @NotNull String password, @NotNull String subjectName, @Nullable String subjectPassword) throws SQLException {
+        String sql;
         final String role = validateCredentials(email, password);
-        if (role.equals("Lecturer")) {
-            insertDoubleStringValue(subjectName, subjectPassword, sql);
-            return true;
+        if (subjectPassword == null) {
+            sql = "INSERT INTO Subjects(SubjectName, NULL) VALUES(?)";
+            if (role.equals("Lecturer")) {
+                insertSubjectWithNullPassword(subjectName, sql);
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            sql = "INSERT INTO Subjects(SubjectName, SubjectPassword) VALUES(?, ?)";
+            if (role.equals("Lecturer")) {
+                insertDoubleStringValue(subjectName, subjectPassword, sql);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private void insertSubjectWithNullPassword(@NotNull String subjectName, String sql) {
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, subjectName);
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
