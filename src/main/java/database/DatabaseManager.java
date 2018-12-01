@@ -90,9 +90,15 @@ public class DatabaseManager {
         }
     }
 
-    public void insertSubject(@NotNull String name, @NotNull String password) {
+    public boolean insertSubject(@NotNull String email, @NotNull String password, @NotNull String subjectName, @NotNull String subjectPassword) throws SQLException {
         String sql = "INSERT INTO Subjects(SubjectName, SubjectPassword) VALUES(?, ?)";
-        insertDoubleStringValue(name, password, sql);
+        final String role = validateCredentials(email, password);
+        if (role.equals("Lecturer")) {
+            insertDoubleStringValue(subjectName, subjectPassword, sql);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void insertDoubleStringValue(@NotNull String param1, @NotNull String param2, String sql) {
