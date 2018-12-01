@@ -28,6 +28,9 @@ public class DatabaseManager {
     private @NotNull
     Connection connection;
 
+    private static final String STUDENT_ROLE = "Student";
+    private static final String LECTURER_ROLE = "Lecturer";
+
     private DatabaseManager() throws ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         database = DataBase.getInstance();
@@ -95,7 +98,7 @@ public class DatabaseManager {
         final String role = validateCredentials(email, password);
         if (subjectPassword == null) {
             sql = "INSERT INTO Subjects(SubjectName, NULL) VALUES(?)";
-            if (role.equals("Lecturer")) {
+            if (role.equals(LECTURER_ROLE)) {
                 insertSubjectWithNullPassword(subjectName, sql);
                 return true;
             } else {
@@ -103,7 +106,7 @@ public class DatabaseManager {
             }
         } else {
             sql = "INSERT INTO Subjects(SubjectName, SubjectPassword) VALUES(?, ?)";
-            if (role.equals("Lecturer")) {
+            if (role.equals(LECTURER_ROLE)) {
                 insertDoubleStringValue(subjectName, subjectPassword, sql);
                 return true;
             } else {
@@ -308,6 +311,32 @@ public class DatabaseManager {
             appointmentType = AppointmentType.einmalig;
         }
         return appointmentType;
+    }
+
+    public Subjects getAllSubjectsForLecturer(@NotNull Credentials credentials) throws SQLException {
+        final String sql = "SELECT Subjects.SubjectId, Subjects.SubjectName, Subjects.SubjectPassword from \n" +
+                "Subjects join Owns on Subjects.SubjectName = Owns.SubjectName \n" +
+        "where Owns.Lecturer = ?";
+        final String role = validateCredentials(credentials.getEmail(), credentials.getPassword());
+        if (!role.equals(LECTURER_ROLE)) {
+            throw new IllegalArgumentException();
+        }
+        final LinkedList<Subject> subjects = new LinkedList<>();
+        try (Connection connection = connectToDatabase()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, credentials.getEmail());
+            final ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                final int subjectId = resultSet.getInt(1);
+                final String subjectName = resultSet.getString(2);
+                final String subjectPassword = resultSet.getString(3);
+                //set subscribed to false in return value because it doesn't matter for the Lecturer
+                subjects.add(new Subject(subjectId, subjectName, subjectPassword, false));
+            }
+            final Subject[] subjectArray = new Subject[subjects.size()];
+            subjects.toArray(subjectArray);
+            return new Subjects(subjectArray);
+        }
     }
 
 

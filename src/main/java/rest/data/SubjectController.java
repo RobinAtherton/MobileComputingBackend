@@ -12,6 +12,7 @@ import rest.data.jsonmodels.SubjectCreatedResponse;
 import rest.data.jsonmodels.CreateSubjectBody;
 import rest.data.jsonmodels.Subjects;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 @Controller
@@ -20,10 +21,20 @@ public class SubjectController {
     @NotNull
     @ResponseBody
     @RequestMapping(value="/subjects/get", method = RequestMethod.POST)
-    public Subjects subjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
+    public Subjects getSubjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
         Subjects subjects = databaseManager.getAllSubjectsForStudent(credentials.getEmail(), credentials.getPassword());
+        return subjects;
+    }
+
+    @NotNull
+    @ResponseBody
+    @RequestMapping(value = "/subjects/getOwn", method = RequestMethod.POST)
+    public Subjects getOwnSubjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
+        final DatabaseManager databaseManager = DatabaseManager.getInstance();
+        databaseManager.getDatabase().connect();
+        Subjects subjects = databaseManager.getAllSubjectsForLecturer(credentials);
         return subjects;
     }
 
@@ -40,6 +51,8 @@ public class SubjectController {
         response.setSubjectCreated(subjectCreated);
         return response;
     }
+
+
 
 
 }
