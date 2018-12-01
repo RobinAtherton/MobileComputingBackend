@@ -64,19 +64,6 @@ public class DatabaseManager {
         }
     }
 
-    public @NotNull
-    boolean validate(@NotNull String email, @NotNull String password) throws SQLException {
-        final String sql = "SELECT Persons.PersonRole from Persons where Email = ? and PersonPassword = ?;";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, email);
-        statement.setString(2, password);
-        final ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public void insertPerson(@NotNull String email, @NotNull String password, @NotNull Role role) {
         String sql = "INSERT INTO Persons(Email, PersonPassword, PersonRole) VALUES(?,?,?)";
@@ -92,12 +79,27 @@ public class DatabaseManager {
         }
     }
 
+    public boolean insertOwns(@NotNull String email, @NotNull String password, @NotNull String subjectName) throws SQLException {
+        String sql = "INSERT INTO Owns(Lecturer, SubjectName) VALUES (?,?)";
+        final String role = validateCredentials(email, password);
+        if (role.equals("Lecturer")) {
+            insertDoubleStringValue(email, subjectName, sql);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void insertSubject(@NotNull String name, @NotNull String password) {
         String sql = "INSERT INTO Subjects(SubjectName, SubjectPassword) VALUES(?, ?)";
+        insertDoubleStringValue(name, password, sql);
+    }
+
+    private void insertDoubleStringValue(@NotNull String param1, @NotNull String param2, String sql) {
         try (Connection connection = this.database.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, name);
-            statement.setString(2, password);
+            statement.setString(1, param1);
+            statement.setString(2, param2);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
