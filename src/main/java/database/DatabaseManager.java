@@ -83,7 +83,7 @@ public class DatabaseManager {
     }
 
     public boolean insertOwns(@NotNull String email, @NotNull String password, @NotNull String subjectName) throws SQLException {
-        String sql = "INSERT INTO Owns(Lecturer, SubjectName) VALUES (?,?)";
+            String sql = "INSERT INTO Owns(Lecturer, SubjectName) VALUES (?,?)";
         final String role = validateCredentials(email, password);
         if (role.equals("Lecturer")) {
             insertDoubleStringValue(email, subjectName, sql);
@@ -155,15 +155,15 @@ public class DatabaseManager {
     }
 
     public int assertOrdinality(@NotNull final String timeSlot) {
-        if (timeSlot.equals("8:45 - 10:15")) {
+        if (timeSlot.equals("8:45 – 10:15")) {
             return 0;
-        } else if (timeSlot.equals("10:30 - 12:00")){
+        } else if (timeSlot.equals("10:30 – 12:00")){
             return 1;
-        } else if (timeSlot.equals("12:50 - 14:20")) {
+        } else if (timeSlot.equals("12:50 – 14:20")) {
             return 2;
-        } else if (timeSlot.equals("14:30 - 16:00")) {
+        } else if (timeSlot.equals("14:30 – 16:00")) {
             return 3;
-        } else if (timeSlot.equals("16:10 - 17:40")) {
+        } else if (timeSlot.equals("16:10 – 17:40")) {
             return 4;
         }
         return -1;
