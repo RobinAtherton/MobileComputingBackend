@@ -4,6 +4,8 @@ import database.models.enums.Role;
 
 import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Robin Atherton
@@ -33,11 +35,13 @@ public class Setup {
         databaseManager.insertOwns("testL", "test", "Mathe I");
         databaseManager.insertAppointment("Mathe I", "gerade","19.11.2018", "Mon", "8:45 - 10:15");
         databaseManager.insertAppointment("Mathe I", "gerade", "20.11.2018", "Tue", "8:45 - 10:15");
+        databaseManager.insertAppointment("Mathe I", "gerade", "24.11.2018", "Tue", "8:45 - 10:15");
         databaseManager.insertAppointment("Vertiefung Datenbanken", "ungerade","20.11.2018", "Mon", "10:30 - 12:00");
         databaseManager.insertAppointment("Vertiefung Datenbanken", "ungerade","20.11.2018", "Tue", "10:30 - 12:00");
         databaseManager.insertAppointment("Programmieren I", "einmalig","19.11.2018", "Mon", "8:45 - 10:15");
         databaseManager.insertAppointment("Programmieren II", "einmalig", "20.11.2018", "Tue", "8:45 - 10:15");
         databaseManager.insertAppointment("Compiler", "gerade","20.11.2018", "Mon", "10:30 - 12:00");
         databaseManager.insertAppointment("Numerik", "gerade","20.11.2018", "Tue", "10:30 - 12:00");
+
     }
 }

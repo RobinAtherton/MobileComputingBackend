@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import rest.auth.Credentials;
-import rest.data.jsonmodels.SubjectCreatedResponse;
 import rest.data.jsonmodels.CreateSubjectBody;
+import rest.data.jsonmodels.SubjectCreatedResponse;
 import rest.data.jsonmodels.Subjects;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 @Controller
