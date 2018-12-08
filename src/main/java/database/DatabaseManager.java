@@ -6,8 +6,8 @@ import database.models.enums.AppointmentType;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.stereotype.Controller;
 import rest.auth.Credentials;
+import rest.data.jsonmodels.AppointmentBody;
 import rest.data.jsonmodels.Appointments;
 import rest.data.jsonmodels.Subjects;
 
@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class DatabaseManager {
 
@@ -207,7 +206,28 @@ public class DatabaseManager {
     public void insertAppointment(@NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDate, @NotNull String appointmentDay, @NotNull String timeSlot) {
         String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDate, AppointmentDay, TimeSlot, Ordinality) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = this.database.connect()) {
-            int subjectId = getSubjectIdForName(subjectName, connection);
+            int subjectId = getSubjectId(subjectName);
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, subjectId);
+            statement.setString(2, appointmentType);
+            statement.setString(3, appointmentDate);
+            statement.setString(4, appointmentDay);
+            statement.setString(5, timeSlot);
+            statement.setInt(6, assertOrdinality(timeSlot));
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertAppointment(@NotNull String email, @NotNull String password, @NotNull String subjectName, @NotNull String appointmentType, @NotNull String appointmentDate, @NotNull String appointmentDay, @NotNull String timeSlot) throws SQLException, IllegalAccessException {
+        String sql = "INSERT INTO Appointments(SubjectId, AppointmentType, AppointmentDate, AppointmentDay, TimeSlot, Ordinality) VALUES (?, ?, ?, ?, ?, ?)";
+        final String role = validateCredentials(email, password);
+        if (!role.equals(LECTURER_ROLE)) {
+            throw new IllegalAccessException();
+        }
+        try (Connection connection = this.database.connect()) {
+            int subjectId = getSubjectId(subjectName);
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, subjectId);
             statement.setString(2, appointmentType);

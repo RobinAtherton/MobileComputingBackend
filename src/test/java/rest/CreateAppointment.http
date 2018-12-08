@@ -1,0 +1,17 @@
+POST http://localhost:8080/appointments/create
+Accept: application/json
+Cache-Control: no-cache
+Content-Type: application/json
+data: jsonString
+
+{
+  "email": "testL",
+  "password": "test",
+  "subjectName": "Mathe I",
+  "appointmentType": "einmalig",
+  "appointmentDate": "19.12.2018",
+  "appointmentDay": "Wed",
+  "timeSlot": "8:45 - 10:15"
+}
+
+###
