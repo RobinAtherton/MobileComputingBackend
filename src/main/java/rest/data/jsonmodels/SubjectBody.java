@@ -6,15 +6,14 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author Robin Atherton
  */
-public class CreateSubjectBody {
+public class SubjectBody {
 
     private String email;
     private String password;
     private String subjectName;
     private String subjectPassword;
 
-
-    public CreateSubjectBody() {
+    public SubjectBody() {
 
     }
     public String getEmail() {

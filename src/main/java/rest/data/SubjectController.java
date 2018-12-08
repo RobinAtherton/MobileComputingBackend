@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import rest.auth.Credentials;
-import rest.data.jsonmodels.CreateSubjectBody;
+import rest.data.jsonmodels.SubjectBody;
 import rest.data.jsonmodels.SubjectCreatedResponse;
 import rest.data.jsonmodels.Subjects;
+import rest.data.jsonmodels.Success;
 
 import java.sql.SQLException;
 
@@ -39,8 +40,18 @@ public class SubjectController {
 
     @NotNull
     @ResponseBody
+    @RequestMapping(value="/subjects/subscribed", method = RequestMethod.POST)
+    public Subjects subjects(@RequestBody Credentials credentials) throws ClassNotFoundException, SQLException {
+        final DatabaseManager databaseManager = DatabaseManager.getInstance();
+        databaseManager.getDatabase().connect();
+        Subjects subjects = databaseManager.getSubscribedSubjectsForStudent(credentials.getEmail());
+        return subjects;
+    }
+
+    @NotNull
+    @ResponseBody
     @RequestMapping(value="/subjects/create", method = RequestMethod.POST)
-    public SubjectCreatedResponse createSubject(@RequestBody CreateSubjectBody body) throws SQLException, ClassNotFoundException {
+    public SubjectCreatedResponse createSubject(@RequestBody SubjectBody body) throws SQLException, ClassNotFoundException {
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();
         boolean subjectCreated = databaseManager.insertSubject(body.getEmail(), body.getPassword(), body.getSubjectName(), body.getSubjectPassword());
@@ -49,6 +60,16 @@ public class SubjectController {
         response.setOwnsCreated(ownsCreated);
         response.setSubjectCreated(subjectCreated);
         return response;
+    }
+
+    @NotNull
+    @ResponseBody
+    @RequestMapping(value="/subjects/delete", method = RequestMethod.POST)
+    public Success deleteSubject(@RequestBody SubjectBody body) throws ClassNotFoundException, SQLException, IllegalAccessException {
+        final DatabaseManager databaseManager = DatabaseManager.getInstance();
+        databaseManager.getDatabase().connect();
+        databaseManager.deleteSubject(body.getEmail(), body.getPassword(), body.getSubjectName());
+        return new Success();
     }
 
 

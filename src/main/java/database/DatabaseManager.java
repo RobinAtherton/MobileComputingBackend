@@ -6,6 +6,7 @@ import database.models.enums.AppointmentType;
 import database.models.enums.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Controller;
 import rest.auth.Credentials;
 import rest.data.jsonmodels.Appointments;
 import rest.data.jsonmodels.Subjects;
@@ -19,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DatabaseManager {
-
 
     private @NotNull
     static DatabaseManager databaseManager = null;
@@ -112,6 +112,73 @@ public class DatabaseManager {
             } else {
                 return false;
             }
+        }
+    }
+
+    public void deleteSubject(@NotNull String email, @NotNull String password, @NotNull String subjectName) throws SQLException, IllegalAccessException {
+        String sql;
+        final String role = validateCredentials(email, password);
+        if (role.equals(LECTURER_ROLE)) {
+            deleteFromAppointments(subjectName);
+            deleteFromOwns(subjectName);
+            deleteFromSubscriptions(subjectName);
+            sql = "DELETE from Subjects WHERE subjectName = ?;";
+            try (Connection connection = this.database.connect()) {
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setString(1, subjectName);
+                statement.executeUpdate();
+            }
+        } else {
+            throw new IllegalAccessException();
+        }
+    }
+
+    private void deleteFromOwns(@NotNull String subjectName) throws SQLException {
+        String sql = "DELETE from Owns WHERE EXISTS subjectName = ?;";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, subjectName);
+            statement.executeUpdate();
+        }
+    }
+
+    /**
+     * Returns -1 if no Column was found
+     * @param subjectName
+     * @return
+     * @throws SQLException
+     */
+    private int getSubjectId(@NotNull String subjectName) throws SQLException {
+        String sql = "SELECT Subjects.SubjectId from Subjects WHERE Subjects.SubjectName = ?;";
+        int result = -1;
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, subjectName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                result = resultSet.getInt(1);
+            }
+        }
+        return result;
+    }
+
+    private void deleteFromAppointments(@NotNull String subjectName) throws SQLException {
+        int subjectId = getSubjectId(subjectName);
+        String sql = "DELETE from Appointments WHERE EXISTS Appointments.SubjectId = ?";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, subjectId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void deleteFromSubscriptions(@NotNull String subjectName) throws SQLException {
+        int subjectId = getSubjectId(subjectName);
+        String sql = "DELETE FROM Subsriptions WHERE EXISTS Subsriptions.SubscriptionId = ?";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, subjectId);
+            statement.executeUpdate();
         }
     }
 

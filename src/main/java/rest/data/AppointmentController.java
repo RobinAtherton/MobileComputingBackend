@@ -16,13 +16,13 @@ import rest.data.jsonmodels.Appointments;
  * @author Robin Atherton
  */
 @Controller
-public class SubscribedAppointmentsController {
+public class AppointmentController {
 
-    Logger logger = LoggerFactory.getLogger(SubscribedAppointmentsController.class);
+    Logger logger = LoggerFactory.getLogger(AppointmentController.class);
 
     @NotNull
     @ResponseBody
-    @RequestMapping(value="/subscribedAppointments", method = RequestMethod.POST)
+    @RequestMapping(value="/appointments/subscribed", method = RequestMethod.POST)
     public Appointments appointments(@RequestBody Credentials credentials) throws ClassNotFoundException{
         final DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.getDatabase().connect();

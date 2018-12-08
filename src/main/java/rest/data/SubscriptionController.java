@@ -13,7 +13,7 @@ import java.sql.SQLException;
 @Controller
 public class SubscriptionController {
 
-    Logger logger = LoggerFactory.getLogger(SubscribedAppointmentsController.class);
+    Logger logger = LoggerFactory.getLogger(AppointmentController.class);
 
     @ResponseBody
     @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
