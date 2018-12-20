@@ -34,7 +34,6 @@ public class Setup {
         databaseManager.insertSubject("testL", "test","Programmieren III", "1234");
         databaseManager.insertOwns("testL", "test", "Mathe I");
         databaseManager.insertAppointment("Mathe I", "gerade","19.11.2018", "Mon", "8:45 - 10:15");
-        databaseManager.insertAppointment("Mathe I", "gerade", "20.11.2018", "Tue", "8:45 - 10:15");
         databaseManager.insertAppointment("Mathe I", "gerade", "24.11.2018", "Tue", "8:45 - 10:15");
         databaseManager.insertAppointment("Vertiefung Datenbanken", "ungerade","20.11.2018", "Mon", "10:30 - 12:00");
         databaseManager.insertAppointment("Vertiefung Datenbanken", "ungerade","20.11.2018", "Tue", "10:30 - 12:00");
