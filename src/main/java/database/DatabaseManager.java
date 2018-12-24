@@ -133,7 +133,7 @@ public class DatabaseManager {
     }
 
     private void deleteFromOwns(@NotNull String subjectName) throws SQLException {
-        String sql = "DELETE from Owns WHERE EXISTS subjectName = ?;";
+        String sql = "DELETE from Owns WHERE EXISTS (SELECT Owns.subjectName WHERE Owns.subjectName = ?);";
         try (Connection connection = this.database.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, subjectName);
@@ -161,9 +161,23 @@ public class DatabaseManager {
         return result;
     }
 
+    public String getSubjectName(@NotNull String subjectName) throws SQLException {
+        String sql = "SELECT Subjects.SubjectName from Subjects WHERE Subjects.SubjectName = ?;";
+        String result = "empty";
+        try (Connection connection = this.database.connect()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, subjectName);
+            ResultSet resultSet = statement.executeQuery();
+            if  (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+        }
+        return result;
+    }
+
     private void deleteFromAppointments(@NotNull String subjectName) throws SQLException {
         int subjectId = getSubjectId(subjectName);
-        String sql = "DELETE from Appointments WHERE EXISTS Appointments.SubjectId = ?";
+        String sql = "DELETE from Appointments WHERE EXISTS (SELECT Appointments.SubjectId WHERE Appointments.SubjectId = ?);";
         try (Connection connection = this.database.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, subjectId);
@@ -173,7 +187,7 @@ public class DatabaseManager {
 
     private void deleteFromSubscriptions(@NotNull String subjectName) throws SQLException {
         int subjectId = getSubjectId(subjectName);
-        String sql = "DELETE FROM Subsriptions WHERE EXISTS Subsriptions.SubscriptionId = ?";
+        String sql = "DELETE from Subscriptions WHERE EXISTS (SELECT Subscriptions.SubscriptionId WHERE Subscriptions.SubscriptionId = ?)";
         try (Connection connection = this.database.connect()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, subjectId);
